@@ -1471,15 +1471,8 @@ void AqlQueue::SetProfiling(bool enabled) {
     dispatch_record_buffer_size_ = num_records;
     dispatch_record_wptr_ = 0;
 
-    hsa_status_t st = agent_->driver().SetQueueProfilingBuffer(
+    agent_->driver().SetQueueProfilingBuffer(
         queue_id_, dispatch_record_buffer_, num_records, &dispatch_record_wptr_);
-    if (st != HSA_STATUS_SUCCESS) {
-      agent_->system_deallocator()(dispatch_record_buffer_);
-      dispatch_record_buffer_ = nullptr;
-      dispatch_record_buffer_size_ = 0;
-      dispatch_record_wptr_ = 0;
-      return;
-    }
     Suspend();
     Resume();
     return;

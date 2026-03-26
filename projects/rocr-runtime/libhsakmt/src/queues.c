@@ -69,6 +69,8 @@ struct queue {
 	 * but only small bytes are used. We use the extra space in the end for
 	 * cu_mask bits array.
 	 */
+	uint64_t dispatch_record_buffer_addr;
+	uint32_t dispatch_record_buffer_size;
 	uint32_t cu_mask_count; /* in bits */
 	uint32_t cu_mask[0];
 };
@@ -827,6 +829,8 @@ HSAKMT_STATUS HSAKMTAPI hsaKmtUpdateQueueCtx(HsaKFDContext *ctx,
 	arg.ring_size = QueueSize;
 	arg.queue_percentage = QueuePercentage;
 	arg.queue_priority = priority_map[Priority+3];
+	arg.dispatch_record_buffer_addr = q->dispatch_record_buffer_addr;
+	arg.dispatch_record_buffer_size = q->dispatch_record_buffer_size;
 
 	int err = hsakmt_ioctl(ctx->fd, AMDKFD_IOC_UPDATE_QUEUE, &arg);
 
@@ -1055,11 +1059,17 @@ HSAKMT_STATUS HSAKMTAPI hsaKmtSetQueueProfilingBuffer(HSA_QUEUEID QueueId,
 							HSAuint32 NumRecords,
 							volatile HSAuint32 *WptrHostAddr)
 {
-	(void)QueueId;
-	(void)BufferBase;
-	(void)NumRecords;
-	(void)WptrHostAddr;
-	return HSAKMT_STATUS_NOT_SUPPORTED;
+	struct queue *q = PORT_UINT64_TO_VPTR(QueueId);
+
+	CHECK_KFD_OPEN();
+
+	if (!q)
+		return HSAKMT_STATUS_INVALID_PARAMETER;
+
+	q->dispatch_record_buffer_addr = (uintptr_t)BufferBase;
+	q->dispatch_record_buffer_size = NumRecords;
+
+	return HSAKMT_STATUS_SUCCESS;
 }
 
 HSAKMT_STATUS HSAKMTAPI hsaKmtDestroyQueue(HSA_QUEUEID QueueId)
