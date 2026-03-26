@@ -1463,8 +1463,9 @@ void AqlQueue::SetProfiling(bool enabled) {
   if (enabled && !dispatch_record_buffer_) {
     constexpr uint32_t num_records = 65536;
     const size_t buf_size = size_t(num_records) * sizeof(mec_dispatch_record);
+    constexpr size_t kCacheLineAlign = 64;
     dispatch_record_buffer_ = agent_->system_allocator()(
-        buf_size, alignof(mec_dispatch_record), core::MemoryRegion::AllocateNonPaged);
+        buf_size, kCacheLineAlign, core::MemoryRegion::AllocateNonPaged);
     if (dispatch_record_buffer_ == nullptr) return;
     memset(dispatch_record_buffer_, 0, buf_size);
     dispatch_record_buffer_size_ = num_records;
@@ -1499,7 +1500,7 @@ hsa_status_t AqlQueue::GetProfilingDispatchRecords(void** buffer_base, uint32_t*
                                                    volatile uint32_t** write_ptr) const {
   if (!dispatch_record_buffer_) return HSA_STATUS_ERROR_NOT_INITIALIZED;
   *buffer_base = dispatch_record_buffer_;
-  *buffer_size = dispatch_record_buffer_size_;
+  *buffer_size = dispatch_record_buffer_size_ * static_cast<uint32_t>(sizeof(mec_dispatch_record));
   *write_ptr = &dispatch_record_wptr_;
   return HSA_STATUS_SUCCESS;
 }

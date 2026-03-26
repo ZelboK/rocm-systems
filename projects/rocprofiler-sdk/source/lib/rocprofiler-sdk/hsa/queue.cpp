@@ -26,6 +26,7 @@
 #include "lib/rocprofiler-sdk/code_object/code_object.hpp"
 #include "lib/rocprofiler-sdk/context/context.hpp"
 #include "lib/rocprofiler-sdk/hsa/details/fmt.hpp"
+#include "lib/rocprofiler-sdk/hsa/dispatch_ring_buffer_support.hpp"
 #include "lib/rocprofiler-sdk/hsa/hsa.hpp"
 #include "lib/rocprofiler-sdk/hsa/queue_controller.hpp"
 #include "lib/rocprofiler-sdk/kernel_dispatch/profiling_time.hpp"
@@ -418,7 +419,8 @@ WriteInterceptor(const void* packets,
         }
 
 #if ROCPROFILER_SDK_HSA_PC_SAMPLING > 0
-        if(pc_sampling::is_pc_sample_service_configured(queue.get_agent().get_rocp_agent()->id))
+        if(pc_sampling::is_pc_sample_service_configured(queue.get_agent().get_rocp_agent()->id) &&
+           !firmware_dispatch_ring_available())
         {
             transformed_packets.emplace_back(pc_sampling::hsa::generate_marker_packet_for_kernel(
                 corr_id, tracing_data_v.external_correlation_ids, dispatch_id));

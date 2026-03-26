@@ -2,6 +2,7 @@
 set(ROCPROFILER_LIB_HSA_SOURCES
     abi.cpp
     agent_cache.cpp
+    dispatch_ring_buffer_support.cpp
     aql_packet.cpp
     async_copy.cpp
     hsa_barrier.cpp
@@ -14,6 +15,7 @@ set(ROCPROFILER_LIB_HSA_SOURCES
     scratch_memory.cpp)
 
 set(ROCPROFILER_LIB_HSA_HEADERS
+    dispatch_ring_buffer_support.hpp
     agent_cache.hpp
     aql_packet.hpp
     async_copy.hpp

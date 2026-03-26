@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "lib/rocprofiler-sdk/hsa/dispatch_ring_buffer_support.hpp"
 #include "lib/rocprofiler-sdk/hsa/queue_controller.hpp"
 #include "lib/common/static_object.hpp"
 #include "lib/rocprofiler-sdk/agent.hpp"
@@ -313,6 +314,8 @@ QueueController::init(CoreApiTable& core_table, AmdExtTable& ext_table)
         }
     }
 
+    dispatch_ring_buffer_resolve_apis();
+
     if(enable_queue_intercept())
     {
         if(*(get_attach_table()))
@@ -517,7 +520,12 @@ enable_queue_intercept()
         bool has_scratch_reporting = itr->is_tracing(ROCPROFILER_CALLBACK_TRACING_SCRATCH_MEMORY) ||
                                      itr->is_tracing(ROCPROFILER_BUFFER_TRACING_SCRATCH_MEMORY);
 
-        if(itr->counter_collection || itr->pc_sampler || has_kernel_tracing ||
+        const bool has_fw_ring           = firmware_dispatch_ring_available();
+        const bool need_intercept_for_pc = (itr->pc_sampler != nullptr) && !has_fw_ring;
+        const bool need_intercept_for_dispatch_tracing =
+            has_kernel_tracing && !has_fw_ring;
+
+        if(itr->counter_collection || need_intercept_for_pc || need_intercept_for_dispatch_tracing ||
            has_scratch_reporting || itr->device_counter_collection || itr->device_thread_trace ||
            itr->dispatch_thread_trace)
             return true;

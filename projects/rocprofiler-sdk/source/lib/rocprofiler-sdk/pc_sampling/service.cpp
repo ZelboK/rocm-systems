@@ -26,6 +26,7 @@
 #if ROCPROFILER_SDK_HSA_PC_SAMPLING > 0
 
 #    include "lib/common/logging.hpp"
+#    include "lib/rocprofiler-sdk/pc_sampling/dispatch_ring_drainer.hpp"
 #    include "lib/rocprofiler-sdk/pc_sampling/hsa_adapter.hpp"
 #    include "lib/rocprofiler-sdk/pc_sampling/ioctl/ioctl_adapter.hpp"
 #    include "lib/rocprofiler-sdk/pc_sampling/utils.hpp"
@@ -317,6 +318,7 @@ service_sync()
 void
 service_fini()
 {
+    stop_firmware_dispatch_ring_drainer();
     flush_all_agent_buffers();
 }
 

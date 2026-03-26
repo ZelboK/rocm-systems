@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "lib/rocprofiler-sdk/pc_sampling/dispatch_ring_drainer.hpp"
 #include "lib/rocprofiler-sdk/pc_sampling/hsa_adapter.hpp"
 #include "lib/rocprofiler-sdk/kernel_dispatch/profiling_time.hpp"
 #include "lib/rocprofiler-sdk/pc_sampling/defines.hpp"
@@ -155,6 +156,8 @@ data_ready_callback(void*                                client_callback_data,
     // PC sampling buffer inside the lambda function called by the CID manager,
     // a component responsible for managing the PC sampling related part of the
     // process of retiring correlation IDs.
+    drain_firmware_dispatch_rings_before_pcs_batch();
+
     agent_session->cid_manager->manage_cids_implicit([&]() {
         size_t samples_num = data_size / sizeof(packet_union_t);
         // allocate a temporary buffer for copying PC samples
@@ -269,6 +272,8 @@ pc_sampling_service_start(context::pc_sampling_service* service)
 void
 pc_sampling_service_stop(context::pc_sampling_service* service)
 {
+    stop_firmware_dispatch_ring_drainer();
+
     auto* pc_sampling_table_ = rocprofiler::hsa::get_table().pc_sampling_ext_;
     for(const auto& [_, agent_session] : service->agent_sessions)
     {
@@ -339,6 +344,8 @@ pc_sampling_service_finish_configuration(context::pc_sampling_service* service)
             std::runtime_error("PCS parser does not accept buffer");
         }
     }
+
+    start_firmware_dispatch_ring_drainer(service);
 
     // Register callbacks for the HSA's queue interceptor.
     // TODO: should we store callback ID in the service?
