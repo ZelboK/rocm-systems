@@ -921,37 +921,6 @@ hsa_status_t HSA_API
     hsa_amd_profiling_set_profiler_enabled(hsa_queue_t* queue, int enable);
 
 /**
- * @brief Iterate all GPU AQL queues in the process.
- *
- * @param[in] callback Invoked with each queue. Return ::HSA_STATUS_INFO_BREAK to stop early
- * (iteration still completes successfully for the API).
- *
- * @param[in] data Caller context passed to @p callback.
- *
- * @retval ::HSA_STATUS_SUCCESS The function has been executed successfully.
- */
-hsa_status_t HSA_API hsa_amd_queue_iterate(
-    hsa_status_t (*callback)(hsa_queue_t* queue, void* data), void* data);
-
-/**
- * @brief Return pointers to the MEC dispatch profiling ring for a queue.
- *
- * @details Valid only after ::hsa_amd_profiling_set_profiler_enabled enabled profiling on this
- * queue with a kernel that supports dispatch-record capture (requires coordinated KFD + thunk).
- *
- * @param[in] queue A valid AQL queue.
- * @param[out] buffer_base Host-accessible ring base.
- * @param[out] buffer_size Number of records (power of two) in the ring.
- * @param[out] write_ptr Device-updated write index / producer counter.
- *
- * @retval ::HSA_STATUS_SUCCESS Outputs are valid.
- * @retval ::HSA_STATUS_ERROR_NOT_INITIALIZED Profiling ring not allocated for this queue.
- */
-hsa_status_t HSA_API hsa_amd_profiling_get_dispatch_records(hsa_queue_t* queue, void** buffer_base,
-                                                            uint32_t* buffer_size,
-                                                            volatile uint32_t** write_ptr);
-
-/**
  * @brief Enable or disable asynchronous memory copy profiling.
  *
  * @details The runtime will provide the copy processing start timestamp and
