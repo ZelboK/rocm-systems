@@ -188,7 +188,7 @@ public:
     (void)buffer_base;
     (void)num_records;
     (void)wptr_host_addr;
-    return HSA_STATUS_ERROR_NOT_SUPPORTED;
+    return static_cast<hsa_status_t>(HSA_STATUS_ERROR_NOT_SUPPORTED);
   }
 
   /// @brief Set the CU mask for a queue.

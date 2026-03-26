@@ -428,11 +428,11 @@ hsa_status_t KfdDriver::SetQueueProfilingBuffer(HSA_QUEUEID queue_id, void* buff
                                                 volatile uint32_t* wptr_host_addr) const {
   if (core::Runtime::runtime_singleton_->thunkLoader()->pfn_hsaKmtSetQueueProfilingBuffer ==
       nullptr)
-    return HSA_STATUS_ERROR_NOT_SUPPORTED;
+    return static_cast<hsa_status_t>(HSA_STATUS_ERROR_NOT_SUPPORTED);
   if (core::Runtime::runtime_singleton_->thunkLoader()
           ->pfn_hsaKmtSetQueueProfilingBuffer(queue_id, buffer_base, num_records, wptr_host_addr) !=
       HSAKMT_STATUS_SUCCESS)
-    return HSA_STATUS_ERROR_NOT_SUPPORTED;
+    return static_cast<hsa_status_t>(HSA_STATUS_ERROR_NOT_SUPPORTED);
   return HSA_STATUS_SUCCESS;
 }
 
