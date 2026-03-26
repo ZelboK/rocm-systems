@@ -1050,6 +1050,18 @@ HSAKMT_STATUS HSAKMTAPI hsaKmtUpdateQueue(HSA_QUEUEID QueueId,
 					Priority, QueueAddress, QueueSize, Event);
 }
 
+HSAKMT_STATUS HSAKMTAPI hsaKmtSetQueueProfilingBuffer(HSA_QUEUEID QueueId,
+							void *BufferBase,
+							HSAuint32 NumRecords,
+							volatile HSAuint32 *WptrHostAddr)
+{
+	(void)QueueId;
+	(void)BufferBase;
+	(void)NumRecords;
+	(void)WptrHostAddr;
+	return HSAKMT_STATUS_NOT_SUPPORTED;
+}
+
 HSAKMT_STATUS HSAKMTAPI hsaKmtDestroyQueue(HSA_QUEUEID QueueId)
 {
 	return hsaKmtDestroyQueueCtx(&hsakmt_primary_kfd_ctx, QueueId);

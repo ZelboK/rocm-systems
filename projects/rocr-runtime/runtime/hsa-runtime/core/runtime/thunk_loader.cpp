@@ -165,6 +165,9 @@ namespace core {
       HSAKMT_PFN(hsaKmtUpdateQueue) = (HSAKMT_DEF(hsaKmtUpdateQueue)*)dlsym(thunk_handle, "hsaKmtUpdateQueue");
       if (HSAKMT_PFN(hsaKmtUpdateQueue) == nullptr) goto ERROR;
 
+      HSAKMT_PFN(hsaKmtSetQueueProfilingBuffer) =
+          (HSAKMT_DEF(hsaKmtSetQueueProfilingBuffer)*)dlsym(thunk_handle, "hsaKmtSetQueueProfilingBuffer");
+
       HSAKMT_PFN(hsaKmtDestroyQueue) = (HSAKMT_DEF(hsaKmtDestroyQueue)*)dlsym(thunk_handle, "hsaKmtDestroyQueue");
       if (HSAKMT_PFN(hsaKmtDestroyQueue) == nullptr) goto ERROR;
 
@@ -471,6 +474,8 @@ ERROR:
       HSAKMT_PFN(hsaKmtCreateQueue) = (HSAKMT_DEF(hsaKmtCreateQueue)*)(&hsaKmtCreateQueue);
       HSAKMT_PFN(hsaKmtCreateQueueExt) = (HSAKMT_DEF(hsaKmtCreateQueueExt)*)(&hsaKmtCreateQueueExt);
       HSAKMT_PFN(hsaKmtUpdateQueue) = (HSAKMT_DEF(hsaKmtUpdateQueue)*)(&hsaKmtUpdateQueue);
+      HSAKMT_PFN(hsaKmtSetQueueProfilingBuffer) =
+          (HSAKMT_DEF(hsaKmtSetQueueProfilingBuffer)*)(&hsaKmtSetQueueProfilingBuffer);
       HSAKMT_PFN(hsaKmtDestroyQueue) = (HSAKMT_DEF(hsaKmtDestroyQueue)*)(&hsaKmtDestroyQueue);
       HSAKMT_PFN(hsaKmtSetQueueCUMask) = (HSAKMT_DEF(hsaKmtSetQueueCUMask)*)(&hsaKmtSetQueueCUMask);
       HSAKMT_PFN(hsaKmtSetMemoryPolicy) = (HSAKMT_DEF(hsaKmtSetMemoryPolicy)*)(&hsaKmtSetMemoryPolicy);

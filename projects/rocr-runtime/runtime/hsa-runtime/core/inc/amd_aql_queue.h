@@ -205,6 +205,9 @@ class AqlQueue : public core::Queue, private core::LocalSignal, public core::Doo
   /// @brief Enables/Disables profiling overrides SetProfiling from core::Queue
   void SetProfiling(bool enabled) override;
 
+  hsa_status_t GetProfilingDispatchRecords(void** buffer_base, uint32_t* buffer_size,
+                                           volatile uint32_t** write_ptr) const;
+
   /// @brief Update signal value using Relaxed semantics
   void StoreRelaxed(hsa_signal_value_t value) override;
 
@@ -333,6 +336,10 @@ class AqlQueue : public core::Queue, private core::LocalSignal, public core::Doo
 
   // Current CU mask
   std::vector<uint32_t> cu_mask_;
+
+  void* dispatch_record_buffer_ = nullptr;
+  uint32_t dispatch_record_buffer_size_ = 0;
+  volatile uint32_t dispatch_record_wptr_ = 0;
 
   // Shared event used for queue errors
   static __forceinline HsaEvent*& queue_event() {
