@@ -339,7 +339,7 @@ class AqlQueue : public core::Queue, private core::LocalSignal, public core::Doo
 
   void* dispatch_record_buffer_ = nullptr;
   uint32_t dispatch_record_buffer_size_ = 0;
-  volatile uint32_t dispatch_record_wptr_ = 0;
+  mutable volatile uint32_t dispatch_record_wptr_ = 0;
 
   // Shared event used for queue errors
   static __forceinline HsaEvent*& queue_event() {
