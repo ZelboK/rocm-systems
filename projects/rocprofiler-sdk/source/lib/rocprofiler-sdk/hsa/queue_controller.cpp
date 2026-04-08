@@ -26,6 +26,7 @@
 #include "lib/rocprofiler-sdk/agent.hpp"
 #include "lib/rocprofiler-sdk/context/context.hpp"
 #include "lib/rocprofiler-sdk/hsa/agent_cache.hpp"
+#include "lib/rocprofiler-sdk/pc_sampling/dispatch_ring_drainer.hpp"
 #include "lib/rocprofiler-sdk/registration.hpp"
 
 #include <rocprofiler-sdk/fwd.h>
@@ -538,6 +539,26 @@ void
 queue_controller_init(HsaApiTable* table)
 {
     CHECK_NOTNULL(get_queue_controller())->init(*table->core_, *table->amd_ext_);
+
+#if ROCPROFILER_SDK_HSA_PC_SAMPLING > 0
+    if(firmware_dispatch_ring_available())
+    {
+        bool needs_standalone_drainer = false;
+        for(const auto& itr : context::get_registered_contexts())
+        {
+            bool has_kernel_tracing =
+                itr->is_tracing(ROCPROFILER_CALLBACK_TRACING_KERNEL_DISPATCH) ||
+                itr->is_tracing(ROCPROFILER_BUFFER_TRACING_KERNEL_DISPATCH);
+            if(has_kernel_tracing && itr->pc_sampler == nullptr)
+            {
+                needs_standalone_drainer = true;
+                break;
+            }
+        }
+        if(needs_standalone_drainer)
+            pc_sampling::start_firmware_dispatch_ring_drainer_standalone();
+    }
+#endif
 }
 
 void
@@ -550,6 +571,9 @@ queue_controller_sync()
 void
 queue_controller_fini()
 {
+#if ROCPROFILER_SDK_HSA_PC_SAMPLING > 0
+    pc_sampling::stop_firmware_dispatch_ring_drainer();
+#endif
     if(get_queue_controller())
         get_queue_controller()->iterate_queues([](const Queue* _queue) { _queue->sync(); });
 }

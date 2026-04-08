@@ -21,6 +21,13 @@ struct PCSAgentSession;
 void
 start_firmware_dispatch_ring_drainer(context::pc_sampling_service* service);
 
+/**
+ * Start the ring drainer without PC sampling infrastructure.
+ * Used for standalone kernel dispatch tracing via the firmware ring buffer.
+ */
+void
+start_firmware_dispatch_ring_drainer_standalone();
+
 void
 stop_firmware_dispatch_ring_drainer();
 
